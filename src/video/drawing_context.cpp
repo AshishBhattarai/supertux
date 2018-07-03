@@ -21,6 +21,9 @@
 
 #include "math/sizef.hpp"
 #include "supertux/gameconfig.hpp"
+#include "supertux/game_session.hpp"
+#include "worldmap/worldmap.hpp"
+#include "gui/menu_manager.hpp"
 #include "supertux/globals.hpp"
 #include "util/obstackpp.hpp"
 #include "video/drawing_request.hpp"
@@ -384,9 +387,49 @@ DrawingContext::do_drawing()
   }
 
   Renderer& renderer = video_system.get_renderer();
-  renderer.start_draw();
-  handle_drawing_requests(drawing_requests);
-  renderer.end_draw();
+
+  // split screen demo
+
+  // Temporary split condition
+  if(!MenuManager::instance().is_active()) {
+    // string single split. Split the screen into two parts.
+    // 0 -- no split
+    // 1 -- single split -- two screens
+    // 2 -- double split -- four screens
+    renderer.set_splitmode(2);
+
+    renderer.screen_split(0); // screen 0
+    // TODO:  player 1 camera  translation here
+    renderer.start_draw();
+    handle_drawing_requests(drawing_requests);
+    renderer.end_draw();
+
+    renderer.screen_split(1); // screen 1
+    // TODO:  player 2 camera  translation here
+    renderer.start_draw();
+    handle_drawing_requests(drawing_requests);
+    renderer.end_draw();
+
+        renderer.screen_split(2); // screen 1
+    // TODO:  player 2 camera  translation here
+    renderer.start_draw();
+    handle_drawing_requests(drawing_requests);
+    renderer.end_draw();
+
+        renderer.screen_split(3); // screen 1
+    // TODO:  player 2 camera  translation here
+    renderer.start_draw();
+    handle_drawing_requests(drawing_requests);
+    renderer.end_draw();
+
+    renderer.end_split();
+
+  } else {
+    renderer.set_splitmode(0);
+    renderer.start_draw();
+    handle_drawing_requests(drawing_requests);
+    renderer.end_draw();
+  }
 
   clear_drawing_requests(lightmap_requests);
   clear_drawing_requests(drawing_requests);

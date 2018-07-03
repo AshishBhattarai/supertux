@@ -382,5 +382,4 @@ SDLRenderer::set_gamma(float gamma)
   SDL_CalculateGammaRamp(gamma, ramp);
   SDL_SetWindowGammaRamp(m_window, ramp, ramp, ramp);
 }
-
 /* EOF */

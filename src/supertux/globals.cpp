@@ -21,6 +21,12 @@
 int SCREEN_WIDTH;
 int SCREEN_HEIGHT;
 
+int LOGICAL_SCREEN_WIDTH;
+int LOGICAL_SCREEN_HEIGHT;
+
+int SPLIT_SCREEN_WIDTH;
+int SPLIT_SCREEN_HEIGHT;
+
 std::unique_ptr<Config> g_config;
 
 float game_time = 0;

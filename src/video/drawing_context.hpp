@@ -169,6 +169,10 @@ public:
    */
   void take_screenshot();
 
+  void add_camera_translations(int no, Vector trans) {
+    camera_translations[no] = trans;
+  }
+
 private:
   typedef std::vector<DrawingRequest*> DrawingRequests;
 
@@ -216,6 +220,8 @@ private:
 
   Target target;
   std::vector<Target> target_stack;
+
+  std::map<int, Vector> camera_translations;
 
   /* obstack holding the memory of the drawing requests */
   struct obstack obst;

@@ -45,6 +45,16 @@ public:
   SDL_Window* get_window() const override { return m_window; }
   SDL_Renderer* get_sdl_renderer() const { return m_renderer; };
 
+  void activate_viewport(int x, int y, int w, int h) override {};
+  SDL_Rect get_viewport() const override {
+    return m_viewport;
+  }
+
+  // needs to be implemented just like gl_renderer
+  void set_splitmode(int mode) override {}
+  void screen_split(int n) override {}
+  void end_split() override {}
+
 private:
   void apply_video_mode();
   void apply_viewport();

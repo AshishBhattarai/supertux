@@ -59,6 +59,12 @@ public:
   virtual Vector to_logical(int physical_x, int physical_y) const = 0;
   virtual void set_gamma(float gamma) = 0;
   virtual SDL_Window* get_window() const = 0;
+
+  virtual void activate_viewport(int x, int y, int w, int h) = 0;
+  virtual SDL_Rect get_viewport() const = 0;
+  virtual void set_splitmode(int mode) = 0;
+  virtual void screen_split(int n) = 0;
+  virtual void end_split() = 0;
 };
 
 #endif

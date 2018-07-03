@@ -31,6 +31,12 @@ extern int SCREEN_WIDTH;
     shrink or scale things) */
 extern int SCREEN_HEIGHT;
 
+extern int LOGICAL_SCREEN_WIDTH;
+extern int LOGICAL_SCREEN_HEIGHT;
+
+extern int SPLIT_SCREEN_WIDTH;
+extern int SPLIT_SCREEN_HEIGHT;
+
 extern std::unique_ptr<Config> g_config;
 
 extern float game_time;

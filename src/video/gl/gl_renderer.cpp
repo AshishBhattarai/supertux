@@ -30,6 +30,8 @@
 #include "video/gl/gl_texture.hpp"
 #include "video/util.hpp"
 
+#include "gui/menu_manager.hpp"
+
 #ifdef USE_GLBINDING
 #  include <glbinding/Binding.h>
 #  include <glbinding/ContextInfo.h>
@@ -48,7 +50,8 @@ GLRenderer::GLRenderer() :
   m_glcontext(),
   m_viewport(),
   m_desktop_size(0, 0),
-  m_fullscreen_active(false)
+  m_fullscreen_active(false),
+  split_mode(0)
 {
   SDL_DisplayMode mode;
   SDL_GetCurrentDisplayMode(0, &mode);
@@ -255,16 +258,26 @@ GLRenderer::apply_config()
 
   Size max_size(3840, 2160);
   Size min_size(640, 480);
-
-  Vector scale;
   Size logical_size;
+  Vector scale;
   calculate_viewport(min_size, max_size, target_size,
                      pixel_aspect_ratio,
                      g_config->magnification,
                      scale,
                      logical_size,
                      m_viewport);
+  load_split_viewports();
 
+  // Temporary split condition
+  // if(split_mode) {
+  //   SCREEN_WIDTH = SPLIT_SCREEN_WIDTH;
+  //   SCREEN_HEIGHT = SPLIT_SCREEN_HEIGHT;
+  // } else {
+  //   SCREEN_WIDTH = logical_size.width;
+  //   SCREEN_HEIGHT = logical_size.height;
+  // }
+  LOGICAL_SCREEN_WIDTH = logical_size.width;
+  LOGICAL_SCREEN_HEIGHT = logical_size.height;
   SCREEN_WIDTH = logical_size.width;
   SCREEN_HEIGHT = logical_size.height;
 
@@ -456,6 +469,75 @@ GLRenderer::set_gamma(float gamma)
   Uint16 ramp[256];
   SDL_CalculateGammaRamp(gamma, ramp);
   SDL_SetWindowGammaRamp(m_window, ramp, ramp, ramp);
+}
+
+void
+GLRenderer::activate_viewport(int x, int y, int w, int h) {
+  glViewport(x, y, w, h);
+  glLoadIdentity();
+}
+
+void
+GLRenderer::load_split_viewports() {
+  if (split_mode == 1) {
+    m_split_viewports[0] = {m_viewport.x, m_viewport.y, m_viewport.w/2, m_viewport.h};
+    m_split_viewports[1] = {m_viewport.w/2, m_viewport.y, m_viewport.w/2, m_viewport.h};
+  } else if (split_mode == 2) {
+    m_split_viewports[0] = {m_viewport.x, m_viewport.y, m_viewport.w/2, m_viewport.h/2};
+    m_split_viewports[1] = { m_viewport.w/2, m_viewport.y, m_viewport.w/2, m_viewport.h/2};
+    m_split_viewports[2] = {m_viewport.x, m_viewport.h/2, m_viewport.w/2, m_viewport.h/2};
+    m_split_viewports[3] = { m_viewport.w/2, m_viewport.h/2, m_viewport.w/2, m_viewport.h/2};
+  }
+  if (split_mode) {
+    SPLIT_SCREEN_HEIGHT = m_split_viewports[0].h;
+    SPLIT_SCREEN_WIDTH = m_split_viewports[0].w;
+  }
+}
+
+void
+GLRenderer::set_splitmode(int mode) {
+  if (mode == 0) {
+    SCREEN_HEIGHT = LOGICAL_SCREEN_HEIGHT;
+    SCREEN_WIDTH = LOGICAL_SCREEN_WIDTH;
+    return;
+  }
+  if(mode != split_mode) {
+    split_mode = mode;
+    load_split_viewports(); // reload new viewports
+  }
+  SCREEN_HEIGHT = SPLIT_SCREEN_HEIGHT;
+  SCREEN_WIDTH = SPLIT_SCREEN_WIDTH;
+}
+
+void
+GLRenderer::screen_split(int n) {
+  if (n < 0 || split_mode == 0) return;
+  if (split_mode == 1 && n > 1) return;
+  if (split_mode == 2 && n > 3) return;
+
+  glViewport(m_split_viewports[n].x, m_split_viewports[n].y, m_split_viewports[n].w,  m_split_viewports[n].h);
+  // glLoadIdentity();
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, SPLIT_SCREEN_WIDTH, SPLIT_SCREEN_HEIGHT, 0, -1, 1);
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glTranslatef(0, 0, 0);
+}
+
+void
+GLRenderer::end_split() {
+  glViewport(m_viewport.x, m_viewport.y, m_viewport.w, m_viewport.h);
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+
+  glOrtho(0,  m_viewport.w, m_viewport.h, 0, -1, 1);
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glTranslatef(0, 0, 0);
 }
 
 /* EOF */

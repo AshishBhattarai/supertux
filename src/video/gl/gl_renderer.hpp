@@ -32,6 +32,8 @@ private:
   SDL_Rect m_viewport;
   Size m_desktop_size;
   bool m_fullscreen_active;
+  int split_mode; // single split (2 screens) or double split (4 screens)
+  SDL_Rect m_split_viewports[4];
 
 public:
   GLRenderer();
@@ -55,8 +57,17 @@ public:
 
   SDL_Window* get_window() const override { return m_window; }
 
+  void activate_viewport(int x, int y, int w, int h) override;
+  SDL_Rect get_viewport() const override {
+    return m_viewport;
+  }
+  void set_splitmode(int mode) override;
+  void screen_split(int n) override;
+  void end_split() override;
+
 private:
   void apply_video_mode();
+  void load_split_viewports();
 
 private:
   GLRenderer(const GLRenderer&) = delete;
