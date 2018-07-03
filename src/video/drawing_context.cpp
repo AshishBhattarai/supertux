@@ -410,14 +410,14 @@ DrawingContext::do_drawing()
     handle_drawing_requests(drawing_requests);
     renderer.end_draw();
 
-        renderer.screen_split(2); // screen 1
-    // TODO:  player 2 camera  translation here
+    renderer.screen_split(2); // screen 2
+    // TODO:  player 3 camera  translation here
     renderer.start_draw();
     handle_drawing_requests(drawing_requests);
     renderer.end_draw();
 
-        renderer.screen_split(3); // screen 1
-    // TODO:  player 2 camera  translation here
+    renderer.screen_split(3); // screen 3
+    // TODO:  player 4 camera  translation here
     renderer.start_draw();
     handle_drawing_requests(drawing_requests);
     renderer.end_draw();
